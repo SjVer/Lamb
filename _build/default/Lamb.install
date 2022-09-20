@@ -1,7 +1,0 @@
-lib: [
-  "_build/install/default/lib/Lamb/META"
-  "_build/install/default/lib/Lamb/dune-package"
-]
-bin: [
-  "_build/install/default/bin/Lamb"
-]
