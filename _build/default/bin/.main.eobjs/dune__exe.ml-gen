@@ -1,0 +1,14 @@
+(** @canonical Dune__exe.Alpha *)
+module Alpha = Dune__exe__Alpha
+
+
+(** @canonical Dune__exe.Fresh *)
+module Fresh = Dune__exe__Fresh
+
+
+(** @canonical Dune__exe.Lang *)
+module Lang = Dune__exe__Lang
+
+
+(** @canonical Dune__exe.Main *)
+module Main = Dune__exe__Main
