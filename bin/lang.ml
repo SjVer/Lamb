@@ -7,15 +7,14 @@ type expr =
   | If of expr * expr * expr
 
 and var = string
-
 and bop = Add | Sub | Mul | Div
+
+let show_bop = function
+  Add -> "+" | Sub -> "-" | Mul -> "*" | Div -> "/"
 
 let print e =
   let pr = print_string in
   let f = Printf.sprintf in
-
-  let show_bop = function
-    Add -> "+" | Sub -> "-" | Mul -> "*" | Div -> "/" in
 
   let rec pe = function 
     | Int l -> pr (string_of_int l)
