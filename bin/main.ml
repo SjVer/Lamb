@@ -14,3 +14,6 @@ let () =
   let e = Norm.normalize e in
   print_endline "\na-normalization:";
   Anf.print e;
+  
+  print_endline "\nclosure-conversion:";
+  Close.convert e;
