@@ -33,4 +33,7 @@ let print e =
       pr "if "; pe c;
       pr " then "; pe t;
       pr " else "; pe e
-  in pe e; print_newline ()
+  in
+  print_char '\t';
+  pe e;
+  print_newline ()
