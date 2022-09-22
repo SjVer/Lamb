@@ -20,7 +20,7 @@ and expr =
   (* if atom then expr else expr *)
   | Tuple of var * atom list * body
   (* let var = (atom; list) in body *)
-  | Index of var * var * int * body
+  | Get of var * var * int * body
   (* let var = var[int] in body *)
 
 and body = expr
@@ -36,12 +36,14 @@ let print =
   let rec join_mapped f = function
     | [] -> ""
     | [x] -> f x
-    | x::xs -> f x ^ "," ^ join_mapped f xs
+    | x::xs -> f x ^ ", " ^ join_mapped f xs
   in
 
   let show_atom = function
     | Int i -> string_of_int i
-    | Var v | Glob v -> v in
+    | Var v -> v
+    | Glob v -> "@" ^ v
+  in
 
   let rec pe i = function
     | Return a -> pr i ("return " ^ show_atom a)
@@ -83,7 +85,7 @@ let print =
       pr i (f "let %s = (%s)" d es);
       pr i "in"; pe i body
 
-    | Index (d, v, n, body) ->
+    | Get (d, v, n, body) ->
       pr i (f "let %s = %s[%d]" d v n);
       pr i "in"; pe i body
 

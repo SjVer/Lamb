@@ -15,25 +15,28 @@ let show_bop = function
 let print e =
   let pr = print_string in
   let f = Printf.sprintf in
+  let opn simple = (if simple then pr "(") in
+  let cls simple = (if simple then pr ")") in
 
-  let rec pe = function 
+  let rec pe simple = function 
     | Int l -> pr (string_of_int l)
     | Var v -> pr v
     | Lam (v, b) ->
+      opn simple;
       pr (f "\\%s . " v);
-      pe b
+      pe false b;
+      cls simple
     | App (e1, e2) ->
-      pe e1;
-      pe e2
+      pe true e1; pr " "; pe false e2
     | Bop (op, e1, e2) ->
-      pe e1;
+      pe true e1;
       pr (f " %s " (show_bop op));
-      pe e2
+      pe false e2
     | If (c, t, e) ->
-      pr "if "; pe c;
-      pr " then "; pe t;
-      pr " else "; pe e
+      pr "if "; pe false c;
+      pr " then "; pe false t;
+      pr " else "; pe false e
   in
   print_char '\t';
-  pe e;
+  pe false e;
   print_newline ()

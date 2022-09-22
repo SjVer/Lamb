@@ -1,8 +1,8 @@
 open Lang
 
 let () =
-  (* \x . \x . x + x *)
-  let e = Lam ("x", Lam ("y", Bop (Add, Var "x", Var "y"))) in
+  (* (\x . \x . x + x) 2 *)
+  let e = App (Lam ("x", Lam ("y", Bop (Add, Var "x", Var "y"))), Int 2) in
 
   print_endline "expression:";
   print e;
@@ -15,5 +15,7 @@ let () =
   print_endline "\na-normalization:";
   Anf.print e;
   
+
+  let e = Close.convert e in
   print_endline "\nclosure-conversion:";
-  Close.convert e;
+  Anf.print e;
