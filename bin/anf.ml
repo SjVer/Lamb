@@ -1,3 +1,5 @@
+open Util
+
 type atom =
   | Int of int
   | Var of var
@@ -33,12 +35,6 @@ let print =
   let pr i = print_string (String.make i '\t'); print_endline in
   let f = Printf.sprintf in
 
-  let rec join_mapped f = function
-    | [] -> ""
-    | [x] -> f x
-    | x::xs -> f x ^ ", " ^ join_mapped f xs
-  in
-
   let show_atom = function
     | Int i -> string_of_int i
     | Var v -> v
@@ -49,7 +45,7 @@ let print =
     | Return a -> pr i ("return " ^ show_atom a)
 
     | Fun (n, vs, e, body) ->
-      let vs' = join_mapped (fun x -> x) vs in
+      let vs' = join_mapped id vs in
       pr i (f "let %s(%s) =" n vs');
       pe (i + 1) e;
       pr i "in"; pe i body;
@@ -89,4 +85,4 @@ let print =
       pr i (f "let %s = %s[%d]" d v n);
       pr i "in"; pe i body
 
-  in pe 1
+  in pe

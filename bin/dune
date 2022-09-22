@@ -1,3 +1,6 @@
 (executable
  (public_name Lamb)
- (name main))
+ (name main)
+ (flags -g)
+ (modes byte exe)
+ (libraries llvm))

@@ -6,24 +6,45 @@ module VS = Set.Make(String)
 let free_vars e =
   let open VS in
   let in_atom = function Var v -> singleton v | _ -> empty in
-  let ( @ ) = union in
+  let (@) = union in
 
-  let rec go acc = function
-    | Return a -> acc @ (in_atom a)
+  let rec go = function
+    | Return a -> in_atom a
 
-    | Fun (f, vs, e, b) ->
-      let in_value = diff (go acc e) (of_list vs) in
-      let in_body = remove f (go acc b) in
-      acc @ in_value @ in_body
+    | Fun (f, vs, v, b) ->
+      let in_value = diff (go v) (of_list vs) in
+      in_value @ remove f (go b)
+
+    | Join (d, p, v, b) ->
+      let in_value = match p with
+        | Some p -> remove p (go v)
+        | None -> go v
+      in
+      in_value @ remove d (go b)
+
+    | Jump (_, Some a) -> in_atom a
+
+    | App (d, v, vs, b) ->
+      let vs' = List.map in_atom vs in
+      let in_value = add v (of_list (List.map VS.choose vs')) in
+      in_value @ remove d (go b)
 
     | Bop (d, _, e1, e2, b) ->
       let in_value = (in_atom e1) @ (in_atom e2) in
-      let in_body = remove d (go acc b) in
-      acc @ in_value @ in_body
+      in_value @ remove d (go b)
 
-    | _ -> acc
+    | If (c, t, e) -> in_atom c @ go t @ go e
+
+    | Tuple (d, es, b) ->
+      let es' = List.map in_atom es in
+      let in_values = of_list (List.map VS.choose es') in
+      in_values @ remove d (go b)
+
+    | Get (d, t, _, b) -> singleton t @ remove d (go b)
+
+    | _ -> empty
   
-  in go empty e
+  in go e
 
 let convert =
   let rec go = function
