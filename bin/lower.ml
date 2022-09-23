@@ -7,7 +7,7 @@ let ctx = Llvm.create_context ()
 let bld = Llvm.builder ctx
 let mdl = Llvm.create_module ctx "module"
 let i64 = Llvm.i64_type ctx
-let cls = Llvm.type_by_name
+(* let cls = Llvm.type_by_name *)
 
 let get_var env v = Printf.eprintf "get_var %s\n" v; SMap.find v env
 let get_glob g = Option.get (Llvm.lookup_function g mdl)
@@ -20,8 +20,8 @@ let lower_atom env = function
   | Var v -> Llvm.build_load (get_var env v) v bld
   | Glob g ->
     print_endline ("lowering glob " ^ g);
-    let g' = Llvm.build_load (get_glob g) g bld in
-    Llvm.build_ptrtoint g' i64 g bld
+    (* let g' = Llvm.build_load (get_glob g) g bld in *)
+    Llvm.build_ptrtoint (get_glob g) i64 g bld
 
 let rec lower_expr env = function
   | Return a -> Llvm.build_ret (lower_atom env a) bld
