@@ -3,4 +3,12 @@
  (name main)
  (flags -g)
  (modes byte exe)
- (libraries llvm))
+ (libraries
+  llvm
+  llvm.executionengine
+  llvm.analysis
+  llvm.scalar_opts
+  llvm.passmgr_builder
+  ctypes
+ )
+)

@@ -9,20 +9,20 @@ let free_vars e =
   let (@) = union in
 
   let rec go = function
-    | Return a -> in_atom a
+    | Return a | Break a -> in_atom a
 
     | Fun (f, vs, v, b) ->
       let in_value = diff (go v) (of_list vs) in
       in_value @ remove f (go b)
 
-    | Join (d, p, v, b) ->
+    (* | Join (d, p, v, b) ->
       let in_value = match p with
         | Some p -> remove p (go v)
         | None -> go v
       in
       in_value @ remove d (go b)
-
-    | Jump (_, Some a) -> in_atom a
+ *)
+    (* | Jump (_, Some a) -> in_atom a *)
 
     | App (d, v, vs, b) ->
       let vs' = List.map in_atom vs in
@@ -33,26 +33,24 @@ let free_vars e =
       let in_value = (in_atom e1) @ (in_atom e2) in
       in_value @ remove d (go b)
 
-    | If (c, t, e) -> in_atom c @ go t @ go e
+    | If (d, c, t, e, b) ->
+      in_atom c @ go t @ go e @ remove d (go b)
 
     | Tuple (d, es, b) ->
       let es' = List.map in_atom es in
       let in_values = of_list (List.map VS.choose es') in
       in_values @ remove d (go b)
 
-    | Get (d, t, _, b) -> singleton t @ remove d (go b)
+    | Get (d, t, _, b) ->
+      singleton t @ remove d (go b)
 
-    | _ -> empty
-  
   in go e
 
 let convert =
   let rec go = function
-    | Return _ as r -> r
-    | Join (f, v, e, b) -> Join (f, v, go e, go b)
-    | Jump _ as j -> j
+    | Return _ | Break _ as r -> r
     | Bop (d, op, e1, e2, b) -> Bop (d, op, e1, e2, go b)
-    | If (c, t, e) -> If (c, go t, go e)
+    | If (d, c, t, e, b) -> If (d, c, go t, go e, go b)
     | Tuple (d, es, b) -> Tuple (d, es, go b)
     | Get (d, v, i, b) -> Get (d, v, i, go b)
 

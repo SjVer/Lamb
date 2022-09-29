@@ -6,8 +6,9 @@ type le = Lang.expr
 type ae = Anf.expr
 type aa = Anf.atom
 
-let normalize =
+let normalize e =
   let mk_ret v = Return v in
+  let mk_brk v = Break v in
   let ( let* ) = (@@) in
 
   (* [cont] is a function that uses the produced `Anf.expr`.
@@ -46,14 +47,8 @@ let normalize =
       Bop (r, op, e1', e2', cont (Var r))
     
     | If (c, t, e) ->
-      (* we produce an if-statement where both branches
-         end up jumping to join-"function" `j` which
-         does the rest. (the contunation function is
-         passed to it: "cont (Var p)".) *)
-      let* c = go c in
-      let j, p = fresh "j", fresh "p" in
-      let join v = Jump (j, Some v) in
-      let if' = If (c, go t join, go e join) in
-      Join (j, Some p, cont (Var p), if')
+      let* c' = go c in
+      let r = fresh "phi" in
+      If (r, c', go t mk_brk, go e mk_brk, cont (Var r))
 
-  in Fun.flip go mk_ret
+  in go e mk_ret
